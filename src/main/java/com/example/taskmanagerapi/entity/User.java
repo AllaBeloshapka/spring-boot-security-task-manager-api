@@ -1,29 +1,29 @@
 package com.example.taskmanagerapi.entity;
-// Пакет, где находятся entity — классы, которые соответствуют таблицам базы данных
+// Package containing entity classes — objects mapped to database tables
 
 import jakarta.persistence.*;
-// Аннотации JPA для связи класса с таблицей базы
+// JPA annotations for mapping classes to database tables
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-// Lombok — автоматически создаёт getters, setters и конструкторы
+// Lombok — automatically generates getters, setters, and constructors
 
 import java.time.LocalDateTime;
-// Класс для хранения даты и времени
+// Class for storing date and time
 
 import java.util.ArrayList;
 import java.util.List;
-// Коллекция List для хранения задач пользователя
+// List collection for storing user's tasks
 
 @Entity
-// Этот класс является сущностью (таблицей в базе данных)
+// This class is a JPA entity (represents a database table)
 
 @Table(name = "users")
-// Имя таблицы в базе данных
+// Name of the table in the database
 
 @Data
-// Lombok создаёт:
+// Lombok generates:
 // getters
 // setters
 // toString
@@ -31,97 +31,97 @@ import java.util.List;
 // hashCode
 
 @NoArgsConstructor
-// Пустой конструктор: new User()
+// No-args constructor: new User()
 
 @AllArgsConstructor
-// Конструктор со всеми полями
+// All-args constructor
 
 public class User {
 
     @Id
-    // Первичный ключ таблицы
+    // Primary key of the table
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    // База данных автоматически создаёт id (1,2,3,4...)
+    // Database automatically generates id values (1,2,3,...)
 
     private Long id;
 
     /**
-     * Уникальный логин пользователя
+     * Unique username of the user
      */
 
     @Column(unique = true, nullable = false)
-    // unique = true → логин должен быть уникальным
-    // nullable = false → поле обязательно
+    // unique = true → username must be unique
+    // nullable = false → field is required
 
     private String username;
 
     /**
-     * Хэшированный пароль (BCrypt)
-     * ⚠️ НИКОГДА не храните пароли в открытом виде!
+     * Hashed password (BCrypt)
+     * NEVER store plain-text passwords!
      */
 
     @Column(nullable = false)
-    // Пароль обязательно должен быть
+    // Password is required
 
     private String password;
-    // Здесь хранится НЕ настоящий пароль,
-    // а его зашифрованная версия (hash)
+    // This is NOT the real password,
+    // but its hashed version
 
     /**
-     * Роль пользователя: USER или ADMIN
-     * Префикс ROLE_ обязателен для Spring Security
+     * User role: USER or ADMIN
+     * ROLE_ prefix is required for Spring Security
      */
 
     @Column(nullable = false)
-    // Роль обязательно должна быть
+    // Role is required
 
     private String role = "ROLE_USER";
-    // По умолчанию новый пользователь получает роль USER
+    // By default, a new user gets USER role
 
     /**
-     * Активен ли аккаунт
+     * Whether the account is active
      */
 
     @Column(nullable = false)
-    // Поле обязательно
+    // Field is required
 
     private Boolean enabled = true;
-    // true = аккаунт активен
-    // false = аккаунт отключён
+    // true = account is active
+    // false = account is disabled
 
     /**
-     * Задачи пользователя
+     * User's tasks
      */
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    // Связь "один пользователь → много задач"
+    // Relationship: one user → many tasks
 
     // mappedBy = "owner"
-    // означает, что связь управляется полем owner в классе Task
+    // means the relationship is controlled by the "owner" field in Task class
 
     // cascade = ALL
-    // если удалить пользователя → удалятся и его задачи
+    // if user is deleted → all their tasks are also deleted
 
     // orphanRemoval = true
-    // если задача убрана из списка задач пользователя → она удаляется из базы
+    // if a task is removed from the user's task list → it is deleted from DB
 
     private List<Task> tasks = new ArrayList<>();
-    // Список задач пользователя
-    // ArrayList создаётся сразу, чтобы список не был null
+    // List of user's tasks
+    // Initialized to avoid null
 
     @Column(nullable = false, updatable = false)
-    // createdAt обязательно
-    // и его нельзя изменить после создания
+    // createdAt is required
+    // and cannot be updated after creation
 
     private LocalDateTime createdAt;
-    // Время создания пользователя
+    // Timestamp of user creation
 
     @PrePersist
-    // Этот метод автоматически вызывается перед сохранением в базу
+    // This method is called automatically before saving to DB
 
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        // Когда пользователь создаётся — автоматически ставим текущую дату
+        // When a user is created — set current timestamp automatically
     }
 }

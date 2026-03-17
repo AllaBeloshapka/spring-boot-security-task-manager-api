@@ -8,15 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    //Находим все задачи определённого пользователя
+
     List<Task> findByOwner(User owner);
 
-    //Находим задачи по статусу
     List<Task> findByStatus(TaskStatus status);
 
-    //Находим задачу определённого пользователя по статусу
     List<Task> findByOwnerAndStatus(User owner, TaskStatus status);
 
-    //Находим задачу по слову
-    List<Task> findByTitleContainingOrDescriptionContaining(String keyword1, String keyword2);
+    List<Task> findByTitleContainingIgnoreCase(String keyword);
+
+    List<Task> findByOwnerAndTitleContainingIgnoreCase(User owner, String keyword);
 }
