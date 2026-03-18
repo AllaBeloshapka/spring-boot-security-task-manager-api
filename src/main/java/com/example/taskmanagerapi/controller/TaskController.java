@@ -13,7 +13,6 @@ import com.example.taskmanagerapi.repository.UserRepository;
 import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Controller for task-related endpoints.
@@ -51,13 +50,13 @@ public class TaskController {
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails
     ) {
 
-        User user = new User();
-        user.setUsername(userDetails.getUsername());
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         return taskService.getUserTasks(user)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
