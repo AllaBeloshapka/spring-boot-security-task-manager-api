@@ -48,8 +48,9 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable()) // disable CSRF for simplicity in REST API
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // allow public auth endpoints
+                        .requestMatchers("/auth/**", "/h2-console/**").permitAll() // allow public auth endpoints
                         .anyRequest().authenticated() // all other endpoints require authentication
                 )
                 .authenticationProvider(authenticationProvider())
