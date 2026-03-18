@@ -52,9 +52,19 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll() // allow public auth endpoints
                         .anyRequest().authenticated() // all other endpoints require authentication
                 )
-                .userDetailsService(userDetailsService)
+                .authenticationProvider(authenticationProvider())
                 .httpBasic(Customizer.withDefaults()); // enable HTTP Basic authentication
 
         return http.build();
+    }
+    @Bean
+    public org.springframework.security.authentication.dao.DaoAuthenticationProvider authenticationProvider() {
+        org.springframework.security.authentication.dao.DaoAuthenticationProvider authProvider =
+                new org.springframework.security.authentication.dao.DaoAuthenticationProvider();
+
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+
+        return authProvider;
     }
 }
