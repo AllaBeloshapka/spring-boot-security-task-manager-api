@@ -8,6 +8,7 @@ import com.example.taskmanagerapi.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.example.taskmanagerapi.repository.UserRepository;
 
 import jakarta.validation.Valid;
 
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class TaskController {
 
     private final TaskService taskService;
-
+    private final UserRepository userRepository;
     /**
      * Create a new task for the current user.
      */
@@ -34,8 +35,8 @@ public class TaskController {
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails
     ) {
 
-        User user = new User();
-        user.setUsername(userDetails.getUsername());
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Task task = taskService.createTask(request, user);
 
