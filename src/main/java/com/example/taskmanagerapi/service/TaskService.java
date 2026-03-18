@@ -74,4 +74,7 @@ public class TaskService {
     public List<Task> searchTasks(String keyword, User user) {
         return taskRepository.findByOwnerAndTitleContainingIgnoreCase(user, keyword);
     }
+    public List<Task> getUserTasksByStatus(User user, TaskStatus status) {
+        return taskRepository.findByOwnerAndStatus(user, status);
+    }
 }

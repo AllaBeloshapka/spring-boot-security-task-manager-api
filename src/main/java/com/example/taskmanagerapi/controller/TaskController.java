@@ -4,6 +4,7 @@ import com.example.taskmanagerapi.dto.TaskRequest;
 import com.example.taskmanagerapi.dto.TaskResponse;
 import com.example.taskmanagerapi.entity.Task;
 import com.example.taskmanagerapi.entity.User;
+import com.example.taskmanagerapi.enums.TaskStatus;
 import com.example.taskmanagerapi.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,14 +48,22 @@ public class TaskController {
      */
     @GetMapping
     public List<TaskResponse> getTasks(
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
+            @RequestParam(required = false) TaskStatus status
     ) {
 
         User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return taskService.getUserTasks(user)
-                .stream()
+        List<Task> tasks;
+
+        if (status != null) {
+            tasks = taskService.getUserTasksByStatus(user, status);
+        } else {
+            tasks = taskService.getUserTasks(user);
+        }
+
+        return tasks.stream()
                 .map(this::mapToResponse)
                 .toList();
     }
