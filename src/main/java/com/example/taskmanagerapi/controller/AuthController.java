@@ -23,6 +23,12 @@ public class AuthController {
     /**
      * Registers a new user.
      */
+
+    @GetMapping("/test")
+    public String test() {
+        return "Auth controller works";
+    }
+
     @PostMapping("/register")
     public UserResponse register(@Valid @RequestBody RegisterRequest request) {
 

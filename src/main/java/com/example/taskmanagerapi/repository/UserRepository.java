@@ -7,14 +7,14 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     /**
-     * Поиск пользователя по username
-     * Используется Spring Security для аутентификации
+     * Find user by username
+     * Used by Spring Security for authentication
      */
     Optional<User> findByUsername(String username);
 
     /**
-     * Проверка существования пользователя
-     * Нужно для предотвращения дубликатов при регистрации
+     * Check if user already exists
+     * Needed to prevent duplicates during registration
      */
     boolean existsByUsername(String username);
 }

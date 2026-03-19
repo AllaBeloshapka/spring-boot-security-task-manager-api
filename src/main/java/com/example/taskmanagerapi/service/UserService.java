@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 /**
  * Service for user-related operations.
  * Handles registration logic.
@@ -38,6 +40,10 @@ public class UserService {
 
         // Encrypt password before saving
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        user.setRole("ROLE_USER");
+        user.setEnabled(true);
+        user.setCreatedAt(LocalDateTime.now());
 
         // Save user to database
         return userRepository.save(user);

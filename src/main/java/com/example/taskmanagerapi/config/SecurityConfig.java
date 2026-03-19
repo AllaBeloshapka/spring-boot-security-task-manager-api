@@ -50,7 +50,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // disable CSRF for simplicity in REST API
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/h2-console/**").permitAll() // allow public auth endpoints
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated() // all other endpoints require authentication
                 )
                 .authenticationProvider(authenticationProvider())
