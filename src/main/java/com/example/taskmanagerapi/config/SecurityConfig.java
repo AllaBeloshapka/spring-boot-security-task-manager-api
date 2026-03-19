@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/auth/test").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated() // all other endpoints require authentication
                 )
