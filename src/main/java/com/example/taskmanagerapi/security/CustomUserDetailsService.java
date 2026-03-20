@@ -3,6 +3,7 @@ package com.example.taskmanagerapi.security;
 import com.example.taskmanagerapi.entity.User;
 import com.example.taskmanagerapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                 true,
                 true,
                 true,
-                Collections.singleton(() -> user.getRole())
+                Collections.singleton(new SimpleGrantedAuthority(user.getRole()))
         );
     }
 }

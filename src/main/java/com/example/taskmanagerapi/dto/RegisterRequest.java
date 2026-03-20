@@ -1,7 +1,10 @@
 package com.example.taskmanagerapi.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Data
 public class RegisterRequest {
