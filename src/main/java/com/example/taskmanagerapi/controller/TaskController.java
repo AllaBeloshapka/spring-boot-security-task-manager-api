@@ -2,6 +2,7 @@ package com.example.taskmanagerapi.controller;
 
 import com.example.taskmanagerapi.dto.TaskRequest;
 import com.example.taskmanagerapi.dto.TaskResponse;
+import com.example.taskmanagerapi.dto.TaskUpdateRequest;
 import com.example.taskmanagerapi.entity.Task;
 import com.example.taskmanagerapi.entity.User;
 import com.example.taskmanagerapi.enums.TaskStatus;
@@ -68,6 +69,20 @@ public class TaskController {
                 .toList();
     }
 
+    @PutMapping("/{id}")
+    public TaskResponse updateTask(
+            @PathVariable Long id,
+            @RequestBody TaskUpdateRequest request,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails
+    ) {
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Task updatedTask = taskService.updateTask(id, request, user);
+
+        return mapToResponse(updatedTask);
+    }
     /**
      * Convert Task entity to TaskResponse DTO.
      */

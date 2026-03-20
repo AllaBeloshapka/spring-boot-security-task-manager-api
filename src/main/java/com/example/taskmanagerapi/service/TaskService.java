@@ -1,6 +1,7 @@
 package com.example.taskmanagerapi.service;
 
 import com.example.taskmanagerapi.dto.TaskRequest;
+import com.example.taskmanagerapi.dto.TaskUpdateRequest;
 import com.example.taskmanagerapi.entity.Task;
 import com.example.taskmanagerapi.entity.User;
 import com.example.taskmanagerapi.enums.TaskStatus;
@@ -76,5 +77,29 @@ public class TaskService {
     }
     public List<Task> getUserTasksByStatus(User user, TaskStatus status) {
         return taskRepository.findByOwnerAndStatus(user, status);
+    }
+    public Task updateTask(Long id, TaskUpdateRequest request, User user) {
+
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        // ❗ проверка владельца
+        if (!task.getOwner().getId().equals(user.getId())) {
+            throw new RuntimeException("Access denied");
+        }
+
+        if (request.getTitle() != null) {
+            task.setTitle(request.getTitle());
+        }
+
+        if (request.getDescription() != null) {
+            task.setDescription(request.getDescription());
+        }
+
+        if (request.getStatus() != null) {
+            task.setStatus(request.getStatus());
+        }
+
+        return taskRepository.save(task);
     }
 }

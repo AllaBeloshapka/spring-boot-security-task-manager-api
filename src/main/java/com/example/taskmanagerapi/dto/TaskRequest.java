@@ -1,5 +1,6 @@
 package com.example.taskmanagerapi.dto;
 
+import com.example.taskmanagerapi.enums.TaskStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -25,4 +26,18 @@ public class TaskRequest {
      */
     @Size(max = 500, message = "Task description must not exceed 500 characters")
     private String description;
+
+    /**
+     * Current task status.
+     * Stored as a string in the database.
+     */
+
+    /* */
+    @Data
+    public class TaskUpdateRequest {
+
+        private String title;
+        private String description;
+        private TaskStatus status;
+    }
 }
