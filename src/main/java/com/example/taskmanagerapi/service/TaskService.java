@@ -9,7 +9,9 @@ import com.example.taskmanagerapi.exception.AccessDeniedTaskException;
 import com.example.taskmanagerapi.exception.TaskNotFoundException;
 import com.example.taskmanagerapi.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,13 +63,13 @@ public class TaskService {
         return task;
     }
 
-    /**
-     * Deletes a task with ownership check.
-     */
-    public void deleteTask(Long id, User user) {
-        Task task = getTaskById(id, user);
-        taskRepository.delete(task);
-    }
+//    /**
+//     * Deletes a task with ownership check.
+//     */
+//    public void deleteTask(Long id, User user) {
+//        Task task = getTaskById(id, user);
+//        taskRepository.delete(task);
+//    }
 
     /**
      * Searches tasks by keyword for a specific user.
@@ -101,5 +103,17 @@ public class TaskService {
         }
 
         return taskRepository.save(task);
+    }
+    public void deleteTask(Long id, User user) {
+
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+
+        if (!task.getOwner().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
+        taskRepository.delete(task);
     }
 }

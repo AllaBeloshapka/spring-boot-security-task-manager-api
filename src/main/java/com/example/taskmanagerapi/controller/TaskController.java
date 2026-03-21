@@ -83,6 +83,18 @@ public class TaskController {
 
         return mapToResponse(updatedTask);
     }
+    @DeleteMapping("/{id}")
+    public void deleteTask(
+            @PathVariable Long id,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails
+    ) {
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        taskService.deleteTask(id, user);
+    }
+
     /**
      * Convert Task entity to TaskResponse DTO.
      */
