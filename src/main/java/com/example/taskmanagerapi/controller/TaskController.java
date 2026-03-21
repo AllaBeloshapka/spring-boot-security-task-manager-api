@@ -44,31 +44,6 @@ public class TaskController {
         return mapToResponse(task);
     }
 
-    /**
-     * Get all tasks for current user.
-     */
-    @GetMapping
-    public List<TaskResponse> getTasks(
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
-            @RequestParam(required = false) TaskStatus status
-    ) {
-
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<Task> tasks;
-
-        if (status != null) {
-            tasks = taskService.getUserTasksByStatus(user, status);
-        } else {
-            tasks = taskService.getUserTasks(user);
-        }
-
-        return tasks.stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
     @PutMapping("/{id}")
     public TaskResponse updateTask(
             @PathVariable Long id,
@@ -93,6 +68,26 @@ public class TaskController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         taskService.deleteTask(id, user);
+    }
+
+    /**
+     * Get all tasks for current user.
+     */
+    @GetMapping
+    public List<TaskResponse> getTasks(
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
+            @RequestParam(required = false) TaskStatus status,
+            @RequestParam(required = false) String keyword
+    ) {
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Task> tasks = taskService.filterTasks(user, status, keyword);
+
+        return tasks.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     /**

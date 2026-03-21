@@ -63,13 +63,6 @@ public class TaskService {
         return task;
     }
 
-//    /**
-//     * Deletes a task with ownership check.
-//     */
-//    public void deleteTask(Long id, User user) {
-//        Task task = getTaskById(id, user);
-//        taskRepository.delete(task);
-//    }
 
     /**
      * Searches tasks by keyword for a specific user.
@@ -104,6 +97,9 @@ public class TaskService {
 
         return taskRepository.save(task);
     }
+
+
+    /*Deletes a task with ownership check.*/
     public void deleteTask(Long id, User user) {
 
         Task task = taskRepository.findById(id)
@@ -116,4 +112,24 @@ public class TaskService {
 
         taskRepository.delete(task);
     }
+
+    public List<Task> filterTasks(User user, TaskStatus status, String keyword) {
+
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+
+        if (hasKeyword && status != null) {
+            return taskRepository.findByOwnerAndStatusAndTitleContainingIgnoreCase(user, status, keyword);
+        }
+
+        if (hasKeyword) {
+            return taskRepository.findByOwnerAndTitleContainingIgnoreCase(user, keyword);
+        }
+
+        if (status != null) {
+            return taskRepository.findByOwnerAndStatus(user, status);
+        }
+
+        return taskRepository.findByOwner(user);
+    }
+
 }
