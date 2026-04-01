@@ -16,74 +16,53 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
-/**
- * Controller for task-related endpoints.
- * All endpoints require authentication.
- */
 @RestController
 @RequestMapping("/tasks")
 @RequiredArgsConstructor
 public class TaskController {
 
     private final TaskService taskService;
-    private final UserRepository userRepository;
+
     /**
-     * Create a new task for the current user.
+     * Создать задачу
      */
     @PostMapping
-    public TaskResponse createTask(
-            @Valid @RequestBody TaskRequest request,
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails
-    ) {
+    public TaskResponse createTask(@RequestBody TaskRequest request) {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Task task = taskService.createTask(request, user);
+        Task task = taskService.createTask(request);
 
         return mapToResponse(task);
     }
 
+    /**
+     * Обновить задачу
+     */
     @PutMapping("/{id}")
     public TaskResponse updateTask(
             @PathVariable Long id,
-            @RequestBody TaskUpdateRequest request,
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails
+            @RequestBody TaskUpdateRequest request
     ) {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Task updatedTask = taskService.updateTask(id, request, user);
+        Task updatedTask = taskService.updateTask(id, request);
 
         return mapToResponse(updatedTask);
     }
+
+    /**
+     * Удалить задачу
+     */
     @DeleteMapping("/{id}")
-    public void deleteTask(
-            @PathVariable Long id,
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails
-    ) {
-
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        taskService.deleteTask(id, user);
+    public void deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
     }
 
     /**
-     * Get all tasks for current user.
+     * Получить все задачи
      */
     @GetMapping
-    public List<TaskResponse> getTasks(
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails,
-            @RequestParam(required = false) TaskStatus status,
-            @RequestParam(required = false) String keyword
-    ) {
+    public List<TaskResponse> getTasks() {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        List<Task> tasks = taskService.filterTasks(user, status, keyword);
+        List<Task> tasks = taskService.getAllTasks();
 
         return tasks.stream()
                 .map(this::mapToResponse)
@@ -91,7 +70,7 @@ public class TaskController {
     }
 
     /**
-     * Convert Task entity to TaskResponse DTO.
+     * Преобразование в DTO
      */
     private TaskResponse mapToResponse(Task task) {
         TaskResponse response = new TaskResponse();

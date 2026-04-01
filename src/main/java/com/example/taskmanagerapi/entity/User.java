@@ -52,8 +52,8 @@ public class User {
      * One user can have multiple tasks.
      * Task.owner is the owning side of the relationship.
      */
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks = new ArrayList<>();
+    //@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    //private List<Task> tasks = new ArrayList<>();
 
     /**
      * Timestamp of user creation.

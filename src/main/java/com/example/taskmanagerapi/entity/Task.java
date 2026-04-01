@@ -46,9 +46,9 @@ public class Task {
      * Task owner.
      * Many tasks can belong to one user.
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private User owner;
+    //@ManyToOne(fetch = FetchType.LAZY)
+    //@JoinColumn(name = "owner_id", nullable = false)
+    //private User owner;
 
     /**
      * Timestamp of task creation.

@@ -27,61 +27,40 @@ public class TaskService {
     private final TaskRepository taskRepository;
 
     /**
-     * Creates a new task for a specific user.
+     * Создать задачу
      */
-    public Task createTask(TaskRequest request, User owner) {
+    public Task createTask(TaskRequest request) {
 
         Task task = new Task();
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setStatus(TaskStatus.NEW);
-        task.setOwner(owner);
-        task.setCreatedAt(LocalDateTime.now());
 
         return taskRepository.save(task);
     }
 
     /**
-     * Returns all tasks for a specific user.
+     * Получить все задачи
      */
-    public List<Task> getUserTasks(User user) {
-        return taskRepository.findByOwner(user);
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
     }
 
     /**
-     * Returns task by id with ownership check.
+     * Получить задачу по id
      */
-    public Task getTaskById(Long id, User user) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
-
-        // Check if user owns this task
-        if (!task.getOwner().getId().equals(user.getId())) {
-            throw new AccessDeniedTaskException("You do not have access to this task");
-        }
-
-        return task;
+    public Task getTaskById(Long id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
     }
-
 
     /**
-     * Searches tasks by keyword for a specific user.
+     * Обновить задачу
      */
-    public List<Task> searchTasks(String keyword, User user) {
-        return taskRepository.findByOwnerAndTitleContainingIgnoreCase(user, keyword);
-    }
-    public List<Task> getUserTasksByStatus(User user, TaskStatus status) {
-        return taskRepository.findByOwnerAndStatus(user, status);
-    }
-    public Task updateTask(Long id, TaskUpdateRequest request, User user) {
+    public Task updateTask(Long id, TaskUpdateRequest request) {
 
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
-
-        // ❗ проверка владельца
-        if (!task.getOwner().getId().equals(user.getId())) {
-            throw new RuntimeException("Access denied");
-        }
 
         if (request.getTitle() != null) {
             task.setTitle(request.getTitle());
@@ -98,38 +77,32 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-
-    /*Deletes a task with ownership check.*/
-    public void deleteTask(Long id, User user) {
+    /**
+     * Удалить задачу
+     */
+    public void deleteTask(Long id) {
 
         Task task = taskRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
-
-        if (!task.getOwner().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
-        }
+                .orElseThrow(() -> new RuntimeException("Task not found"));
 
         taskRepository.delete(task);
     }
 
-    public List<Task> filterTasks(User user, TaskStatus status, String keyword) {
-
-        boolean hasKeyword = keyword != null && !keyword.isBlank();
-
-        if (hasKeyword && status != null) {
-            return taskRepository.findByOwnerAndStatusAndTitleContainingIgnoreCase(user, status, keyword);
-        }
-
-        if (hasKeyword) {
-            return taskRepository.findByOwnerAndTitleContainingIgnoreCase(user, keyword);
-        }
-
-        if (status != null) {
-            return taskRepository.findByOwnerAndStatus(user, status);
-        }
-
-        return taskRepository.findByOwner(user);
+    /**
+     * Поиск по ключевому слову
+     */
+    public List<Task> searchTasks(String keyword) {
+        return taskRepository.findAll().stream()
+                .filter(task -> task.getTitle().toLowerCase().contains(keyword.toLowerCase()))
+                .toList();
     }
 
+    /**
+     * Фильтр по статусу
+     */
+    public List<Task> getTasksByStatus(TaskStatus status) {
+        return taskRepository.findAll().stream()
+                .filter(task -> task.getStatus() == status)
+                .toList();
+    }
 }
